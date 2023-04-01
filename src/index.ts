@@ -1,7 +1,7 @@
 import { PendoMetadataKind } from "./types.js";
 import loadFromCSV from "./csv/loadFromCSV.js";
 import loadVisitorCustomFieldNames from "./pendo/loadVisitorCustomFieldNames.js";
-import saveVisitorCustomValues from "./pendo/saveVisitorCustomValues.js";
+import saveCustomValues from "./pendo/saveVisitorCustomValues.js";
 import convertToVisitorMetadata from "./converters/convertToVisitorMetadata.js";
 import inquirer from "inquirer";
 
@@ -39,7 +39,7 @@ async function main() {
 
   // PendoにPostする
   console.log("\nPendoのカスタム項目の値を更新します。");
-  await saveVisitorCustomValues({ postData, ...context });
+  await saveCustomValues({ postData, ...context });
   console.log("\nPendoのカスタム項目の値を更新が完了しました。");
 
   exit(0);
@@ -47,13 +47,13 @@ async function main() {
 
 async function promptContext(): Promise<{
   integrationKey: string;
-  target: PendoMetadataKind;
+  kind: PendoMetadataKind;
   csvPath: string;
 }> {
   return await inquirer.prompt([
     {
       type: "list",
-      name: "target",
+      name: "kind",
       message: "インポートの対象を選択してください",
       choices: ["visitor", "account"],
     },
