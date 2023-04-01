@@ -4,41 +4,29 @@ import {
   PendoMetadataKind,
 } from "../types.js";
 
-async function saveVisitorCustomValues({
-  integrationKey,
-  postData,
-}: {
-  integrationKey: string;
-  postData: Array<VisitorMetadata>;
-}) {
-  await apiPostV1MetadataKindGroupValue({
-    integrationKey: integrationKey,
-    kind: "visitor",
-    data: postData,
-  });
-}
-
-async function apiPostV1MetadataKindGroupValue({
-  integrationKey,
-  kind,
-  data,
-}: {
+type Props = {
   integrationKey: string;
   kind: PendoMetadataKind;
-  data: Array<VisitorMetadata | AccountMetadata>;
-}) {
-  const END_POINT = `https://app.pendo.io/api/v1/metadata/${kind}/custom/value`;
+  postData: Array<VisitorMetadata | AccountMetadata>;
+};
+
+async function saveCustomValues(props: Props) {
+  await apiPostV1MetadataKindGroupValue(props);
+}
+
+async function apiPostV1MetadataKindGroupValue(props: Props) {
+  const END_POINT = `https://app.pendo.io/api/v1/metadata/${props.kind}/custom/value`;
   const res = await fetch(END_POINT, {
     method: "POST",
     headers: new Headers({
       "content-type": "application/json",
-      "x-pendo-integration-key": integrationKey,
+      "x-pendo-integration-key": props.integrationKey,
     }),
-    body: JSON.stringify(data),
+    body: JSON.stringify(props.postData),
     redirect: "follow",
   });
   console.log(`Status: ${res.status} ${res.statusText}`);
   console.log(await res.text());
 }
 
-export default saveVisitorCustomValues;
+export default saveCustomValues;
