@@ -1,6 +1,10 @@
 import fetch from "node-fetch";
 import split from 'just-split';
 
+import getLogger from "../utils/getLogger.js";
+
+const logger = getLogger();
+
 import {
   VisitorMetadata,
   AccountMetadata,
@@ -25,8 +29,8 @@ async function saveCustomValues(props: Props) {
         postData: v
       });
     } catch (e) {
-      console.log("下記のデータ更新でエラーが発生しました");
-      console.log(props.postData);
+      logger.error("下記のデータ更新でエラーが発生しました");
+      logger.error(props.postData);
     }
   }));
 }
@@ -42,10 +46,18 @@ async function apiPostV1MetadataKindGroupValue(props: Props) {
     body: JSON.stringify(props.postData),
     redirect: "follow",
   });
-  console.log(`Status: ${res.status} ${res.statusText}`);
-  console.log(await res.text());
+
+  logger.info("------------------------------");
+  logger.info(`EndPoint: ${END_POINT}`);
   if (res.status !== 200) {
-    throw new Error();
+    logger.error(`Status: ${res.status} ${res.statusText}`);
+    logger.error(await res.text());
+    logger.info("------------------------------");
+    throw new Error("APIリクエストに失敗しました");
+  } else {
+    logger.info(`Status: ${res.status} ${res.statusText}`);
+    logger.info(await res.text());
+    logger.info("------------------------------");
   }
 }
 

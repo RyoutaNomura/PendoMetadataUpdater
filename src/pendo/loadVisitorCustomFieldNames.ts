@@ -1,5 +1,8 @@
 import fetch from "node-fetch";
 import { PendoMetadataKind } from "../types.js";
+import getLogger from "../utils/getLogger.js";
+
+const logger = getLogger();
 
 type Props = {
   integrationKey: string;
@@ -22,11 +25,14 @@ async function apiGetV1MetadataSchemaKind(props: Props) {
     redirect: "follow",
   });
 
-  if (res.status != 200) {
-    throw new Error(
-      `APIリクエストに失敗しました。${res.status} ${res.statusText}`
-    );
+  logger.info("------------------------------");
+  logger.info(`EndPoint: ${END_POINT}`);
+  logger.info(`Status: ${res.status} ${res.statusText}`);
+  if (res.status !== 200) {
+    throw new Error("APIリクエストに失敗しました");
   }
+  logger.info("------------------------------");
+
   return (await res.json()) as any;
 }
 
