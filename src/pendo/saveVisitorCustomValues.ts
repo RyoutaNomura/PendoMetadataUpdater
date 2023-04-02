@@ -1,4 +1,6 @@
 import fetch from "node-fetch";
+import split from 'just-split';
+
 import {
   VisitorMetadata,
   AccountMetadata,
@@ -11,8 +13,22 @@ type Props = {
   postData: Array<VisitorMetadata | AccountMetadata>;
 };
 
+const batchSize = 1000;
+
 async function saveCustomValues(props: Props) {
-  await apiPostV1MetadataKindGroupValue(props);
+  const dataArray = split(props.postData, batchSize);
+  await Promise.all(dataArray.map(async (v) => {
+    try {
+      await apiPostV1MetadataKindGroupValue({
+        integrationKey: props.integrationKey,
+        kind: props.kind,
+        postData: v
+      });
+    } catch (e) {
+      console.log("下記のデータ更新でエラーが発生しました");
+      console.log(props.postData);
+    }
+  }));
 }
 
 async function apiPostV1MetadataKindGroupValue(props: Props) {
@@ -28,6 +44,9 @@ async function apiPostV1MetadataKindGroupValue(props: Props) {
   });
   console.log(`Status: ${res.status} ${res.statusText}`);
   console.log(await res.text());
+  if (res.status !== 200) {
+    throw new Error();
+  }
 }
 
 export default saveCustomValues;
